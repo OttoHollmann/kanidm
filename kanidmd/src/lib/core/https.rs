@@ -442,6 +442,12 @@ async fn json_rest_event_credential_put(
 //
 // json_rest_event_put_id(path, req, state
 
+pub async fn ping_get(req: tide::Request<AppState>) -> tide::Result {
+    let mut res = tide::Response::new(200);
+    res.set_body("pong");
+    Ok(res)
+}
+
 pub async fn schema_get(req: tide::Request<AppState>) -> tide::Result {
     // NOTE: This is filter_all, because from_internal_message will still do the alterations
     // needed to make it safe. This is needed because there may be aci's that block access
@@ -1286,6 +1292,9 @@ pub fn create_https_server(
     raw_route.at("/search").post(search);
 
     tserver.at("/v1/auth").post(auth);
+
+    let mut ping_route = tserver.at("/v1/ping");
+    ping_route.at("/").get(ping_get);
 
     let mut schema_route = tserver.at("/v1/schema");
     schema_route.at("/").get(schema_get);
